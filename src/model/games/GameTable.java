@@ -1,4 +1,4 @@
-package model;
+package model.games;
 
 public class GameTable {
 	private String name;

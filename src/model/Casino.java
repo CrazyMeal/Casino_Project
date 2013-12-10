@@ -3,6 +3,8 @@ package model;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import model.games.GameTable;
+
 public class Casino {
 	private HashMap<String,GameTable> tablesList;
 	private String name;
