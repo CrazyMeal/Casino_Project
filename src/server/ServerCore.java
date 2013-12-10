@@ -33,7 +33,7 @@ public class ServerCore {
 	public void run() {
 		while (this.online) {
 			try {
-				Thread thread = new Thread(new ServerService(serverSocket.accept()));
+				Thread thread = new Thread(new PlayerService(serverSocket.accept()));
 				this.services.put(thread.getId(),thread);
 				
 				thread.start();

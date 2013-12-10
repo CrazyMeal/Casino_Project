@@ -1,4 +1,4 @@
-package model;
+package model.net;
 
 public class Protocol {
 	public static final int port = 9998;
