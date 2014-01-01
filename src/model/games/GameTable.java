@@ -1,7 +1,8 @@
 package model.games;
 
 public class GameTable {
-	private String name;
+	protected String name;
+	protected String[] gameChoices;
 	
 	public GameTable(){	}
 	
@@ -15,5 +16,11 @@ public class GameTable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String[] getChoices(){
+		return this.gameChoices;
+	}
+	public int getSize(){
+		return this.gameChoices.length;
 	}
 }

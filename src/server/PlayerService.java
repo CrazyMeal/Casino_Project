@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import model.Casino;
 import model.Player;
 import model.net.CasinoReader;
 import model.net.CasinoWriter;
@@ -21,14 +22,16 @@ public class PlayerService implements Runnable{
 	private Socket serviceSocket;
 	private CasinoReader cReader;
 	private CasinoWriter cWriter;
+	private Casino casino;
 	private boolean online;
 	private Player player;
 	
 	public PlayerService(){}
 	
-	public PlayerService(Socket serviceSocket){
+	public PlayerService(Socket serviceSocket,Casino casino){
 		this.serviceSocket = serviceSocket;
 		this.online = false;
+		this.casino = casino;
 		this.player = new Player();
 	}
 	
@@ -52,21 +55,6 @@ public class PlayerService implements Runnable{
 					System.out.println(this.reader.readString());
 					System.out.flush();
 					break;
-				case ProtocolBrute.GET_MY_BRUTE:
-					this.createBrute();
-					if(this.myBrute != null){
-						this.writer.writeDiscriminant(ProtocolBrute.OK);
-						this.writer.writeBrute(this.myBrute);
-						this.writer.send();
-						System.out.println("Brute envoyée");
-						break;
-					}
-					else{
-						this.writer.writeDiscriminant(ProtocolBrute.ERROR_GENERAL);
-						this.writer.send();
-						System.out.println("Erreur lors de l'envoi de la brute");
-						break;
-					}
 					/* ------------------------------ OLD ---------------------------------------- */
 				case Protocol.CONNECT_ME:
 					this.player.setPseudo(this.cReader.readString());
@@ -74,21 +62,49 @@ public class PlayerService implements Runnable{
 					this.cWriter.writeDiscriminant(Protocol.OK);
 					this.cWriter.send();
 					break;
+				case Protocol.GET_TABLE_LIST:
+					System.out.println("Client demande liste des table");
+					this.cWriter.writeTables(this.casino);
+					this.cWriter.send();
+					break;
+				case Protocol.GET_STATE:
+					break;
+				case Protocol.JOIN_TABLE:
+					System.out.println("Client veut join");
+					String tableChoosen = this.cReader.readString();
+					this.cWriter.writeChoosenTable(this.casino.getTablesList().get(tableChoosen));
+					this.cWriter.send();
+					break;
 				case Protocol.BUY:
 					this.player.getMoreCash();
+					System.out.println("Le joueur "+this.player.getPseudo()+" a maintenant "+String.valueOf(this.player.getCash())+"$");
 					this.cWriter.writeDiscriminant(Protocol.OK);
 					this.cWriter.send();
 					break;
 				case Protocol.CASH:
 					this.cWriter.writeInt(this.player.getCash());
+					System.out.println("Envoi du montant du cash au joueur"+this.player.getCash());
+					this.cWriter.send();
+					break;
+				case Protocol.BID:
+					int bid = this.cReader.readInt();
+					this.player.setBid(bid);
+					System.out.println("Le joueur vient de parier"+String.valueOf(bid));
+					this.cWriter.writeDiscriminant(Protocol.OK);
+					this.cWriter.send();
+					break;
+				case Protocol.LEAVE:
+					this.online = false;
+					this.cWriter.writeDiscriminant(Protocol.OK);
 					this.cWriter.send();
 					break;
 				}
 			}
+			this.stop();
 		} catch (IOException e) {
 			if(e.getClass().equals(SocketException.class)){
 				this.stop();
-				System.out.println("Client #"+this.getId()+" disconnected");
+				System.out.println("Client #"+this.getId()+" déconnecté inopinément");
 			}
 			else
 				e.printStackTrace();
@@ -103,11 +119,20 @@ public class PlayerService implements Runnable{
 			this.writer.close();
 			this.online = false;
 			this.serviceSocket.close();
+			System.out.println("Client #"+this.getId()+" s'est déconnecté");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	public long getId(){
 		return Thread.currentThread().getId();
+	}
+
+	public Casino getCasino() {
+		return casino;
+	}
+
+	public void setCasino(Casino casino) {
+		this.casino = casino;
 	}
 }

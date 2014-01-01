@@ -1,6 +1,8 @@
 package client;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
@@ -15,9 +17,31 @@ import javax.swing.LayoutStyle;
 import javax.swing.UIManager;
 
 public class CasinoFrame extends JFrame {
-
+	private JButton buttonBid;
+    private JButton buttonCash;
+    private JButton buttonConnect;
+    private JButton buttonJoin;
+    private JButton buttonLeave;
+    private JButton buttonList;
+    private JButton buttonState;
+    private JButton buyButton;
+    private JTextField fieldBid;
+    private JTextField fieldPseudo;
+    private JList jList1;
+    private JList jList2;
+    private JLabel labelCash;
+    private JLabel labelState;
+    private JScrollPane listGame;
+    private JScrollPane listTables;
+    private ClientCore client;
+    
     public CasinoFrame() {
         initComponents();
+    }
+    public CasinoFrame(ClientCore client) {
+        this.client = client;
+    	initComponents();
+    	this.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,6 +104,14 @@ public class CasinoFrame extends JFrame {
 
         buttonCash.setText("Cash");
 
+        
+        this.buttonConnect.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				client.sendPseudo(fieldPseudo.getText());
+			}
+        	
+        });
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -180,22 +212,4 @@ public class CasinoFrame extends JFrame {
             }
         });
     }
-
-   
-    private JButton buttonBid;
-    private JButton buttonCash;
-    private JButton buttonConnect;
-    private JButton buttonJoin;
-    private JButton buttonLeave;
-    private JButton buttonList;
-    private JButton buttonState;
-    private JButton buyButton;
-    private JTextField fieldBid;
-    private JTextField fieldPseudo;
-    private JList jList1;
-    private JList jList2;
-    private JLabel labelCash;
-    private JLabel labelState;
-    private JScrollPane listGame;
-    private JScrollPane listTables;
 }

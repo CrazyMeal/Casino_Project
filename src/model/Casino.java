@@ -15,7 +15,9 @@ public class Casino {
 		this.name = name;
 		this.tablesList = new HashMap<String,GameTable>();
 	}
-	
+	public void insertGameTable(GameTable table){
+		this.tablesList.put(table.getName(), table);
+	}
 	GameTable getTableByObject(GameTable gameTable){
 		GameTable tableToReturn = null;
 		for(Entry<String, GameTable> gameTableEntry : this.tablesList.entrySet()){

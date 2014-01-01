@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import model.net.CasinoReader;
 import model.net.CasinoWriter;
@@ -33,6 +34,8 @@ public class ClientCore {
 			
 			this.cReader = new CasinoReader(this.socket.getInputStream());
 			this.cWriter = new CasinoWriter(this.socket.getOutputStream());
+			
+			CasinoFrame frame = new CasinoFrame(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -58,12 +61,104 @@ public class ClientCore {
 					}
 				}
 				if(userInput.contains("connect")){
+					String pseudo = userInput.split(" ")[1];
 					this.cWriter.writeDiscriminant(Protocol.CONNECT_ME);
-					this.cWriter.writeString("mon pseudoooo");
+					this.cWriter.writeString(pseudo);
 					this.cWriter.send();
 					this.cReader.readDiscriminant();
 					System.out.println("OK !");
 				}
+				if(userInput.contains("tables")){
+					this.cWriter.writeDiscriminant(Protocol.GET_TABLE_LIST);
+					this.cWriter.send();
+					ArrayList<String> list = this.cReader.readTables();
+					System.out.println(list.get(0));
+					System.out.println(list.get(1));
+				}
+				if(userInput.contains("join")){
+					this.cWriter.writeByte(Protocol.JOIN_TABLE);
+					this.cWriter.writeString(userInput.split(" ")[1]);
+					this.cWriter.send();
+					ArrayList<String> list2 = this.cReader.readChoosenTable();
+					System.out.println(list2.get(0));
+					System.out.println(list2.get(1));
+				}
+				// Link to frame done
+				if(userInput.contains("leave")){
+					this.cWriter.writeDiscriminant(Protocol.LEAVE);
+					this.cWriter.send();
+					if(this.cReader.readDiscriminant() == Protocol.OK){
+						System.out.println("Deconnecté avec succès");
+						this.alive = false;
+					}
+					else{
+						System.out.println("Erreur lors de la deconnection");
+					}
+				}
+				// Link to frame done
+				if(userInput.equals("buy")){
+					this.cWriter.writeDiscriminant(Protocol.BUY);
+					this.cWriter.send();
+					if(this.cReader.readDiscriminant() == Protocol.OK){
+						System.out.println("Achat effectué avec succès");
+					}else{
+						System.out.println("Echec lors de l'achat de cash");
+					}
+				}
+				if(userInput.contains("bid")){
+					this.cWriter.writeDiscriminant(Protocol.BID);
+					this.cWriter.writeInt(Integer.parseInt(userInput.split(" ")[1]));
+					this.cWriter.send();
+					if(this.cReader.readDiscriminant() == Protocol.OK){
+						System.out.println("Paris enregistré avec succès");
+					} else {
+						System.out.println("Echec lors de l'enregistrement du paris");
+					}
+				}
+				if(userInput.equals("cash")){
+					this.cWriter.writeDiscriminant(Protocol.CASH);
+					this.cWriter.send();
+					System.out.println("Vous avez actuellement "+this.cReader.readInt());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void sendPseudo(String pseudo){
+		this.cWriter.writeDiscriminant(Protocol.CONNECT_ME);
+		this.cWriter.writeString(pseudo);
+		try {
+			this.cWriter.send();
+			this.cReader.readDiscriminant();
+			System.out.println("OK !");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void doLeave(){
+		this.cWriter.writeDiscriminant(Protocol.LEAVE);
+		try {
+			this.cWriter.send();
+			if(this.cReader.readDiscriminant() == Protocol.OK){
+				System.out.println("Deconnecté avec succès");
+				this.alive = false;
+			}
+			else{
+				System.out.println("Erreur lors de la deconnection");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	public void doBuy(){
+		this.cWriter.writeDiscriminant(Protocol.BUY);
+		try {
+			this.cWriter.send();
+			if(this.cReader.readDiscriminant() == Protocol.OK){
+				System.out.println("Achat effectué avec succès");
+			}else{
+				System.out.println("Echec lors de l'achat de cash");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

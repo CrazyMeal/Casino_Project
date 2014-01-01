@@ -4,6 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Map.Entry;
+
+import model.Casino;
+import model.games.GameTable;
 
 public class CasinoWriter {
 	private OutputStream outputStream;
@@ -14,6 +18,20 @@ public class CasinoWriter {
 	public CasinoWriter(OutputStream outputStream){
 		this.outputStream = outputStream;
 		this.byteOutputStream = new ByteArrayOutputStream();
+	}
+	public void writeChoosenTable(GameTable gameTable){
+		int size = gameTable.getSize();
+		this.writeInt(size);
+		for(int i=0;i<size;i++){
+			this.writeString(gameTable.getChoices()[i]);
+		}
+	}
+	public void writeTables(Casino casino){
+		int size = casino.getTablesList().size();
+		this.writeInt(size);
+		for(Entry<String, GameTable> gt : casino.getTablesList().entrySet()){
+			this.writeString(gt.getKey());
+		}
 	}
 	public void writeString(String string){
 		try {
@@ -35,10 +53,7 @@ public class CasinoWriter {
 		this.writeByte(discriminant);
 	}
 	public void send() throws IOException{
-		ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(this.byteOutputStream.toByteArray());
-        byte[] send = message.toByteArray();
-        
+		byte[] send = this.byteOutputStream.toByteArray();
         this.outputStream.write(send);
         this.flush();
 	}
@@ -46,6 +61,7 @@ public class CasinoWriter {
 		try {
 			this.byteOutputStream.flush();
 			this.outputStream.flush();
+			this.byteOutputStream.reset();
 		} catch (IOException e) {
 			System.out.println("Probleme lors du flush des streams");
 			e.printStackTrace();

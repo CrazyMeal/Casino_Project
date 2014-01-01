@@ -2,6 +2,7 @@ package model.net;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class CasinoReader {
 private InputStream inputStream;
@@ -11,9 +12,24 @@ private InputStream inputStream;
 	public CasinoReader(InputStream inputStream){
 		this.inputStream = inputStream;
 	}
-	
 	public byte readDiscriminant() throws IOException{
 		return this.readByte();
+	}
+	public ArrayList<String> readChoosenTable(){
+		ArrayList<String> array = new ArrayList<String>();
+		int size = this.readInt();
+		for(int i=0;i<size;i++){
+			array.add(this.readString());
+		}
+		return array;
+	}
+	public ArrayList<String> readTables(){
+		ArrayList<String> array = new ArrayList<String>();
+		int size = this.readInt();
+		for(int i=0;i<size;i++){
+			array.add(this.readString());
+		}
+		return array;
 	}
 	public String readString(){
 		String outString = null;
