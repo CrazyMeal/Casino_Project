@@ -27,12 +27,12 @@ public class CasinoFrame extends JFrame {
     private JButton buyButton;
     private JTextField fieldBid;
     private JTextField fieldPseudo;
-    private JList jList1;
-    private JList jList2;
+    private JList tableList;
+    private JList gameList;
     private JLabel labelCash;
     private JLabel labelState;
-    private JScrollPane listGame;
-    private JScrollPane listTables;
+    private JScrollPane listGamePanel;
+    private JScrollPane listTablesPanel;
     private ClientCore client;
     
     public CasinoFrame() {
@@ -48,11 +48,11 @@ public class CasinoFrame extends JFrame {
     private void initComponents() {
 
         fieldPseudo = new JTextField();
-        listTables = new JScrollPane();
-        jList1 = new JList();
+        listTablesPanel = new JScrollPane();
+        tableList = new JList();
         buttonConnect = new JButton();
-        listGame = new JScrollPane();
-        jList2 = new JList();
+        listGamePanel = new JScrollPane();
+        gameList = new JList();
         fieldBid = new JTextField();
         buttonBid = new JButton();
         buttonState = new JButton();
@@ -67,22 +67,25 @@ public class CasinoFrame extends JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         fieldPseudo.setText("pseudo");
-
-        jList1.setModel(new AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+        
+        /*
+        tableList.setModel(new AbstractListModel() {
+            String[] strings = { "Item 60", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        listTables.setViewportView(jList1);
-
+        */
+        //listTablesPanel.setViewportView(tableList);
         buttonConnect.setText("Connect");
-
-        jList2.setModel(new AbstractListModel() {
+        
+        /*
+        gameList.setModel(new AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        listGame.setViewportView(jList2);
+        */
+        //listGamePanel.setViewportView(gameList);
 
         fieldBid.setText("bid");
 
@@ -112,6 +115,65 @@ public class CasinoFrame extends JFrame {
 			}
         	
         });
+        this.buttonCash.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				labelCash.setText(String.valueOf(client.doCash()));
+			}
+        	
+        });
+        this.buyButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				client.doBuy();
+			}
+        });
+        this.buttonBid.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				client.doBid(Integer.parseInt(fieldBid.getText()));
+			}
+        });
+        this.buttonLeave.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				client.doLeave();
+			}
+        });
+        this.buttonList.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tableList.setModel(new AbstractListModel<String>() {
+					String[] strings = client.doList();
+					@Override
+					public int getSize() {
+						return strings.length;
+					}
+					@Override
+					public String getElementAt(int index) {
+						return strings[index];
+					}
+				});
+				listTablesPanel.setViewportView(tableList);
+			}
+        });
+        this.buttonJoin.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gameList.setModel(new AbstractListModel<String>() {
+					String[] strings = client.doJoin(tableList.getSelectedValue().toString());
+					@Override
+					public int getSize() {
+						return strings.length;
+					}
+					@Override
+					public String getElementAt(int index) {
+						return strings[index];
+					}
+				});
+				listGamePanel.setViewportView(gameList);
+			}
+        });
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,7 +182,7 @@ public class CasinoFrame extends JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(listTables)
+                        .addComponent(listTablesPanel)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(fieldPseudo, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -141,7 +203,7 @@ public class CasinoFrame extends JFrame {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addComponent(labelState)
                             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                .addComponent(listGame, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(listGamePanel, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
                                 .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                     .addComponent(fieldBid)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -165,8 +227,8 @@ public class CasinoFrame extends JFrame {
                 .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(listGame, GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addComponent(listTables))
+                        .addComponent(listGamePanel, GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addComponent(listTablesPanel))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(buttonList)
                         .addGap(20, 20, 20)

@@ -164,6 +164,60 @@ public class ClientCore {
 			e.printStackTrace();
 		}
 	}
+	public int doCash(){
+		this.cWriter.writeDiscriminant(Protocol.CASH);
+		try {
+			this.cWriter.send();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int cash = this.cReader.readInt();
+		System.out.println("Vous avez actuellement "+cash);
+		return cash;
+	}
+	public void doBid(int bid){
+		this.cWriter.writeDiscriminant(Protocol.BID);
+		this.cWriter.writeInt(bid);
+		try {
+			this.cWriter.send();
+			if(this.cReader.readDiscriminant() == Protocol.OK){
+				System.out.println("Paris enregistré avec succès");
+			} else {
+				System.out.println("Echec lors de l'enregistrement du paris");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public String[] doList(){
+		this.cWriter.writeDiscriminant(Protocol.GET_TABLE_LIST);
+		try {
+			this.cWriter.send();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ArrayList<String> list = this.cReader.readTables();
+		String[] stockArr = new String[list.size()];
+	    stockArr = list.toArray(stockArr);
+	    for(String s : stockArr)
+	        System.out.println(s);
+		return stockArr;
+	}
+	public String[] doJoin(String choice){
+		this.cWriter.writeByte(Protocol.JOIN_TABLE);
+		this.cWriter.writeString(choice);
+		try {
+			this.cWriter.send();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ArrayList<String> list = this.cReader.readChoosenTable();
+		String[] stockArr = new String[list.size()];
+	    stockArr = list.toArray(stockArr);
+	    for(String s : stockArr)
+	        System.out.println(s);
+		return stockArr;
+	}
 	public void stop(){
 		try {
 			this.writer.close();
