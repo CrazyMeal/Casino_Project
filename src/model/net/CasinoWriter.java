@@ -3,6 +3,7 @@ package model.net;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map.Entry;
 
@@ -44,7 +45,12 @@ public class CasinoWriter {
 		}
 	}
 	public void writeInt(int i){
-		this.byteOutputStream.write(i);
+		//this.byteOutputStream.write(i);
+		try {
+			this.byteOutputStream.write(ByteBuffer.allocate(4).putInt(i).array());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public void writeByte(byte valueByte){
 		this.byteOutputStream.write(valueByte);

@@ -52,8 +52,9 @@ public class PlayerService implements Runnable{
 				/* ------------------------------ OLD ---------------------------------------- */
 				case ProtocolBrute.TEST:
 					System.out.println("trame de test");
-					System.out.println(this.reader.readString());
-					System.out.flush();
+					System.out.println(this.cReader.readInt());
+					this.cWriter.writeInt(256);
+					this.cWriter.send();
 					break;
 					/* ------------------------------ OLD ---------------------------------------- */
 				case Protocol.CONNECT_ME:

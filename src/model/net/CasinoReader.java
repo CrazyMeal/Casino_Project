@@ -2,6 +2,7 @@ package model.net;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class CasinoReader {
@@ -48,6 +49,7 @@ private InputStream inputStream;
 		return outString;
 	}
 	public int readInt(){
+		/*
 		int tmp = 0;
 		try {
 			tmp = this.inputStream.read();
@@ -55,6 +57,18 @@ private InputStream inputStream;
 			e.printStackTrace();
 		}
 		return tmp;
+		*/
+		byte[] b = new byte[4];
+        int read = 0;
+        while(read < 4){
+            try {
+				read += this.inputStream.read(b, read, 4 - read);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+        ByteBuffer bb = ByteBuffer.wrap(b);
+        return bb.getInt();
 	}
 	public byte readByte() throws IOException{
 		byte[] b = new byte[1];

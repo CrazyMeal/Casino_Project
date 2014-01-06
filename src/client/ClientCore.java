@@ -47,14 +47,15 @@ public class ClientCore {
         try {
 			while (this.alive && (userInput = stdIn.readLine()) != null) {
 				if(userInput.equals("test")){
-					this.writer.writeDiscriminant(ProtocolBrute.TEST);
-					this.writer.writeString("SALUT");
-					this.writer.send();
+					this.cWriter.writeDiscriminant(ProtocolBrute.TEST);
+					this.cWriter.writeInt(1000);
+					this.cWriter.send();
 					System.out.println("trame envoyée");
+					System.out.println(this.cReader.readInt());
 				}
 				if(userInput.equals("brute")){
-					this.writer.writeDiscriminant(ProtocolBrute.GET_MY_BRUTE);
-					this.writer.send();
+					this.cWriter.writeDiscriminant(ProtocolBrute.GET_MY_BRUTE);
+					this.cWriter.send();
 					if(this.reader.readDiscriminant() == ProtocolBrute.OK){
 						Brute brute = this.reader.readBrute();
 						System.out.println(brute.toString());
